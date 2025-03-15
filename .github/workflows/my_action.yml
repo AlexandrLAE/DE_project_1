@@ -1,4 +1,4 @@
-name: Deploy
+name: Deploy_DE_project_1
 
 on:
   push:
@@ -8,16 +8,19 @@ on:
 jobs:
   deploy:
     runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v2
-      # Setup key
-      - run: set -eu
-      - run: mkdir "$HOME/.ssh"
-      - run: echo "$" > "$HOME/.ssh/key"
-      - run: chmod 600 "$HOME/.ssh/key"
-      # Build
-      # - run: npm ci
-      # - run: npm run build
-      # Deploy
-      - run: cd app && rsync -e "ssh -p 20022 -i $HOME/.ssh/key -o StrictHostKeyChecking=no" --archive --compress --delete . root@1111:/home/m71516/public_html/blog.maxgraph.ru
 
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v3
+
+    - name: Deploy to VPS via SSH
+      uses: appleboy/ssh-action@master
+      with:
+        host: 188.225.86.62
+        username: root
+        key: ${{ secrets.SSH_PRIVATE_KEY}}
+        script: |
+          cd /home && mkdir DE_project_1
+          cd /home/DE_project_1
+          git pull origin main
+          docker-compose up -d
